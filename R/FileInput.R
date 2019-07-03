@@ -11,6 +11,8 @@ read.metadata <- function(input.folder,md.filename = "metadata.csv"){
   md <- as.data.frame(md)
   #make filenames character vectors
   md$file_name <- as.character(md$file_name)
+  #testing: print file_name data type
+  print(typeof(md$file_name))
   return(md)
 }
 
