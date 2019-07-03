@@ -7,6 +7,8 @@
 #' @export
 read.metadata <- function(input.folder,md.filename = "metadata.csv"){
   md <- read.csv(paste0(input.folder,md.filename))
+  #make filenames character vectors
+  md$file_name <- as.character(md$file_name)
   return(md)
 }
 
