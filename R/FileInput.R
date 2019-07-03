@@ -8,7 +8,9 @@
 read.metadata <- function(input.folder,md.filename = "metadata.csv"){
   md <- read.csv(paste0(input.folder,md.filename))
   #make filenames character vectors
-  md$file_name <- as.data.frame.character(md$file_name)
+  md$file_name <- as.character(md$file_name)
+  #make md into df
+  md <- as.data.frame(md)
   return(md)
 }
 
