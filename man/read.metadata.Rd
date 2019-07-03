@@ -12,5 +12,6 @@ read.metadata(input.folder, md.filename = "metadata.csv")
 \item{md.filename}{metadata filename, defaults to metadata.csv as outputted by generation script}
 }
 \description{
-Reads metadata file and produces format friendly to scripts in Zunder lab pipeline
+Reads metadata file and produces format friendly to scripts in Zunder lab pipeline. Metadata
+strategy inspired by Nowicka et al., 2017, F1000 Research
 }
