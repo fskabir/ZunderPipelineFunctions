@@ -2,5 +2,6 @@
 
 export(get.transform.annotate)
 export(get.transform.markers)
+export(read.concat.transformed)
 export(read.metadata)
 export(read.panel)

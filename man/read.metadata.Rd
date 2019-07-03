@@ -2,7 +2,7 @@
 % Please edit documentation in R/FileInput.R
 \name{read.metadata}
 \alias{read.metadata}
-\title{Read metadata}
+\title{Metadata file input}
 \usage{
 read.metadata(input.folder, md.filename = "metadata.csv")
 }
