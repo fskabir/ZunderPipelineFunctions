@@ -35,7 +35,7 @@ read.panel <- function(input.folder,panel.filename = "panel.csv"){
 #' function
 #' @export
 get.transform.markers <- function(panel){
-  transform.markers <- panel$Metal[panel$Clustering == 1 || panel$Plotting == 1]
+  transform.markers <- panel$Metal[panel$Clustering == 1 | panel$Plotting == 1]
   return(transform.markers)
 }
 
@@ -44,6 +44,6 @@ get.transform.markers <- function(panel){
 #' function
 #' @export
 get.transform.annotate <- function(panel){
-  transform.markers.annotate <- paste0(panel$Antigen[panel$Clustering == 1 || panel$Plotting == 1],"_",panel$Metal[panel$Clustering == 1 || panel$Plotting == 1])
+  transform.markers.annotate <- paste0(panel$Antigen[panel$Clustering == 1 | panel$Plotting == 1],"_",panel$Metal[panel$Clustering == 1 || panel$Plotting == 1])
   return(transform.markers.annotate)
 }
