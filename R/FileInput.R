@@ -58,6 +58,6 @@ read.layout <- function(input.folder,layout.filename = "UMAP_layout.csv"){
 #' @export
 read.clustering.rep <- function(input.folder,cluster.rep.filename = "ClusterStabilityCheck.csv"){
   #Add 1 since clustering done in Python begins indexing at zero
-  clustering.rep <- read.csv(paste0(input.folder,clustering.rep.filename),header = FALSE) + 1
+  clustering.rep <- read.csv(paste0(input.folder,cluster.rep.filename),header = FALSE) + 1
   return(clustering.rep)
 }
