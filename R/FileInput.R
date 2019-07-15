@@ -27,11 +27,37 @@ read.panel <- function(input.folder,panel.filename = "panel.csv"){
 #' Concat_Transformed file input
 #'
 #' Reads Concat_Transformed file for use in Zunder lab pipeline
-#' @param input.folder directory containing metadata file
+#' @param input.folder directory containing concat_transformed file
 #' @param concat.transformed.filename concat_transformed filename, defaults to
 #' Concat_Transformed.csv as outputted by generation script
 #' @export
-read.concat.transformed <- function(input.folder,concat.transformed.filename = "Concat_Tranformed.csv"){
+read.concat.transformed <- function(input.folder,
+                                    concat.transformed.filename = "Concat_Tranformed.csv"){
   concat.transformed <- read.csv(paste0(input.folder,concat.transformed.filename))
+  return(concat.transformed)
 }
 
+#' Layout file input
+#'
+#' Reads uMAP or other 2D layout for plotting
+#' @param input.folder directory containing layout file
+#' @param layout.filename layout filename, defaults to UMAP_layout.csv as outputted by generation
+#'  script
+#' @export
+read.layout <- function(input.folder,layout.filename = "UMAP_layout.csv"){
+  layout <- read.csv(paste0(input.folder,layout.filename))
+  return(layout)
+}
+
+#' Clustering replicate file input
+#'
+#' Reads clustering replicates for consensus clustering and stability analysis
+#' @param input.folder directory containing layout file
+#' @param clustering.rep.filename clustering replicate filename, defaults to
+#' ClusterStabilityCheck.csv as outputted by generation script
+#' @export
+read.clustering.rep <- function(input.folder,cluster.rep.filename = "ClusterStabilityCheck.csv"){
+  #Add 1 since clustering done in Python begins indexing at zero
+  clustering.rep <- read.csv(paste0(input.folder,clustering.rep.filename),header = FALSE) + 1
+  return(clustering.rep)
+}
