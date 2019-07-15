@@ -2,6 +2,7 @@
 
 export(consensus_and_stability)
 export(get.clustering.annotate)
+export(get.plotting.annotate)
 export(get.transform.annotate)
 export(get.transform.markers)
 export(read.clustering.rep)
