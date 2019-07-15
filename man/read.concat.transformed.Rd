@@ -8,7 +8,7 @@ read.concat.transformed(input.folder,
   concat.transformed.filename = "Concat_Tranformed.csv")
 }
 \arguments{
-\item{input.folder}{directory containing metadata file}
+\item{input.folder}{directory containing concat_transformed file}
 
 \item{concat.transformed.filename}{concat_transformed filename, defaults to
 Concat_Transformed.csv as outputted by generation script}

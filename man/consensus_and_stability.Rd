@@ -12,11 +12,11 @@ consensus_and_stability(clust_iter_list = NULL,
   clust_iter_table = NULL)
 }
 \arguments{
-\item{cluster_iter_list}{a list of lists.  First level list is just all the iterations.  Second
+\item{clust_iter_list}{a list of lists.  First level list is just all the iterations.  Second
 level (inner) list is a list of each cluster, each one containing the indices of all the
 original datapoints assigned to that cluster}
 
-\item{cluster_iter_table}{a matrix with each column as separate iteration of cluster assignments
+\item{clust_iter_table}{a matrix with each column as separate iteration of cluster assignments
 (same length as full or initially sampled dataset) --note that there should be NAs in this
 table because we want clustering iterations from samples of the dataset (to see how stable
 clusters are)}
