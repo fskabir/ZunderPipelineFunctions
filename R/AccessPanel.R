@@ -5,7 +5,7 @@
 #' function
 #' @export
 get.transform.markers <- function(panel){
-  transform.markers <- panel$Metal[panel$Clustering == 1 | panel$Plotting == 1]
+  transform.markers <- as.character(panel$Metal[panel$Clustering == 1 | panel$Plotting == 1])
   return(transform.markers)
 }
 
@@ -14,9 +14,10 @@ get.transform.markers <- function(panel){
 #' function
 #' @export
 get.transform.annotate <- function(panel){
-  transform.markers.annotate <- paste0(panel$Antigen[panel$Clustering == 1 | panel$Plotting == 1],
+  transform.markers.annotate <- as.character(paste0(panel$Antigen[panel$Clustering == 1 |
+                                                                    panel$Plotting == 1],
                                        "_",panel$Metal[panel$Clustering == 1 |
-                                                         panel$Plotting == 1])
+                                                         panel$Plotting == 1]))
   return(transform.markers.annotate)
 }
 
@@ -25,8 +26,8 @@ get.transform.annotate <- function(panel){
 #' function
 #' @export
 get.clustering.annotate <- function(panel){
-  clustering.markers.annotate <- paste0(panel$Antigen[panel$Clustering == 1],"_",
-                                        panel$Metal[panel$Clustering == 1])
+  clustering.markers.annotate <- as.character(paste0(panel$Antigen[panel$Clustering == 1],"_",
+                                        panel$Metal[panel$Clustering == 1]))
   return(clustering.markers.annotate)
 }
 
@@ -35,7 +36,7 @@ get.clustering.annotate <- function(panel){
 #' function
 #' @export
 get.plotting.annotate <- function(panel){
-  plotting.markers.annotate <- paste0(panel$Antigen[panel$Plotting == 1],"_",
-                                      panel$Metal[panel$Plotting == 1])
+  plotting.markers.annotate <- as.character(paste0(panel$Antigen[panel$Plotting == 1],"_",
+                                                   panel$Metal[panel$Plotting == 1]))
   return(plotting.markers.annotate)
 }
