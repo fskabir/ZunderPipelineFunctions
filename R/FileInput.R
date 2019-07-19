@@ -55,10 +55,11 @@ read.layout <- function(input.folder,layout.filename = "UMAP_layout.csv"){
 #' @param input.folder directory containing layout file
 #' @param cluster.filename clustering replicate filename, defaults to clusters.csv as outputted by
 #'  generation script
+#' @importFrom data.table fread
 #' @export
 read.clusters <- function(input.folder,clusters.filename = "clusters.csv"){
   #Add 1 since clustering done in Python begins indexing at zero
-  clusters <- as.vector(t(read.csv(paste0(input.folder,clusters.filename),header = FALSE))) + 1
+  clusters <- as.vector(t(fread(paste0(input.folder,clusters.filename)))) + 1
   return(clusters)
 }
 
