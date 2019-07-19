@@ -59,7 +59,7 @@ read.layout <- function(input.folder,layout.filename = "UMAP_layout.csv"){
 #' @export
 read.clusters <- function(input.folder,clusters.filename = "clusters.csv"){
   #Add 1 since clustering done in Python begins indexing at zero
-  clusters <- as.vector(fread(paste0(input.folder,clusters.filename)) + 1)
+  clusters <- as.vector(t(fread(paste0(input.folder,clusters.filename))) + 1)
   return(clusters)
 }
 
