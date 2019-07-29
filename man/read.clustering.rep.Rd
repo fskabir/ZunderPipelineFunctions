@@ -5,7 +5,7 @@
 \title{Clustering replicate file input}
 \usage{
 read.clustering.rep(input.folder,
-  cluster.rep.filename = "ClusterStabilityCheck.csv")
+  clustering.rep.filename = "ClusterStabilityCheck.csv")
 }
 \arguments{
 \item{input.folder}{directory containing layout file}

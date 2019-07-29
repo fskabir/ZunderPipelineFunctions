@@ -9,7 +9,7 @@ read.clusters(input.folder, clusters.filename = "clusters.csv")
 \arguments{
 \item{input.folder}{directory containing layout file}
 
-\item{cluster.filename}{clustering replicate filename, defaults to clusters.csv as outputted by
+\item{clusters.filename}{clustering replicate filename, defaults to clusters.csv as outputted by
 generation script}
 }
 \description{

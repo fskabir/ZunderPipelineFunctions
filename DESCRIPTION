@@ -7,6 +7,12 @@ Maintainer: Corey williams <cmw6pa@virginia.edu>
 Description: Initial goal is to make file input/output simple across multiple scripts in 
     script-based pipeline. May eventually be used to provide wrapper functions for 
     different clustering techniques, dimensionality reduction technique, etc.
+Imports: 
+    data.table,
+    dbscan,
+    igraph,
+    FNN,
+    dplyr
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

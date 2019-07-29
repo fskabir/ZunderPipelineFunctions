@@ -2,11 +2,7 @@
 % Please edit documentation in R/ClusterStabilityAnalysis.R
 \name{consensus_and_stability}
 \alias{consensus_and_stability}
-\title{Cluster Stability Testing/Quantification
-Subset and cluster multiple times (store cluster assignments in table)
-Then 1) find a way to assign universal names for clusters
-and 2) quantify cluster stability for each cluster, and
-also 3) quantify often each data point (cell) is assigned to its primary cluster}
+\title{Get consensus clusters and measures of cluster stability}
 \usage{
 consensus_and_stability(clust_iter_list = NULL,
   clust_iter_table = NULL)
@@ -22,9 +18,5 @@ table because we want clustering iterations from samples of the dataset (to see 
 clusters are)}
 }
 \description{
-Cluster Stability Testing/Quantification
-Subset and cluster multiple times (store cluster assignments in table)
-Then 1) find a way to assign universal names for clusters
-and 2) quantify cluster stability for each cluster, and
-also 3) quantify often each data point (cell) is assigned to its primary cluster
+Get consensus clusters and measures of cluster stability
 }
