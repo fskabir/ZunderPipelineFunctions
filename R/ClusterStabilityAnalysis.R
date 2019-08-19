@@ -178,7 +178,7 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL,
   if (is.null(INPUT.FOLDER)) {INPUT.FOLDER <- getwd()} #so script calling this function doesn't have to change for now
   ggsave(paste0(INPUT.FOLDER, "/cluster_of_cluster_UMAP.png"),
          plot = ggplot(plotting.df,aes(x=umap_x,y=umap_y, color=factor(cluster))) + 
-           geom_point(size = POINT.SIZE) + 
+           geom_point(size = 0.8) + 
            theme(panel.grid.major = element_blank(), 
                  panel.grid.minor = element_blank(), 
                  panel.background = element_blank(), 
