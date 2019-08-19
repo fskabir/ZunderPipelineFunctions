@@ -111,11 +111,12 @@ iterate_louvain_clusters <- function(input_dataset=NULL, subsample_size=NULL, nu
 #'  (same length as full or initially sampled dataset) --note that there should be NAs in this
 #'  table because we want clustering iterations from samples of the dataset (to see how stable
 #'  clusters are)
+#' @param INPUT.FOLDER folder to write umap layout figure          
 #' @importFrom igraph make_empty_graph
 #' @importFrom igraph add_edges
 #' @importFrom igraph cluster_louvain
 #' @export
-consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL) {
+consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL, INPUT.FOLDER=NULL) {
   # if clusters are only provided in table format, generate the list too
   if(is.null(clust_iter_list)) {
     clust_iter_list <- apply(clust_iter_table, 2, function(x){
@@ -166,6 +167,24 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL)
   cl_cl <- cluster_louvain(jac_gr)
   cl_cl_assignments <- cl_cl$membership
 
+  # then use distance matrix to generate umap layout of clusters
+  umap.settings <- umap.defaults
+  umap.settings$input <- 'dist'
+  clusters_umap <- umap(jac_dists, config = umap.settings)
+  # now create df with umap coordinates and cluster id for final clusters
+  plotting.df <- data.frame(clusters_umap$layout, cl_cl_assignments)
+  colnames(plotting.df) <- c('umap_x', 'umap_y', 'cluster')
+  # generate and save umap layout colored by cluster
+  if (is.null(INPUT.FOLDER)) {INPUT.FOLDER <- getwd()} #so script calling this function doesn't have to change for now
+  ggsave(paste0(INPUT.FOLDER, "/cluster_of_cluster_UMAP.png"),
+         plot = ggplot(plotting.df,aes(x=umap_x,y=umap_y, color=factor(cluster))) + 
+           geom_point(size = POINT.SIZE) + 
+           theme(panel.grid.major = element_blank(), 
+                 panel.grid.minor = element_blank(), 
+                 panel.background = element_blank(), 
+                 axis.line = element_line(colour = "black")),
+         height = 7,width = 7)
+           
   # transform cluster numbering from local (each iteration) to global (consensus numbering)
   #start with old table (local, non-consensus numbering) - this will be written over with
   #consensus numbering
