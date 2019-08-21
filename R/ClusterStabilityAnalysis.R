@@ -166,15 +166,25 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL,
   # consensus clusters assignments
   cl_cl <- cluster_louvain(jac_gr)
   cl_cl_assignments <- cl_cl$membership
-
-  # then use distance matrix to generate umap layout of clusters
+  #########################################################
+  # Use distance matrix to generate umap layout of clusters
+  #########################################################
+  # currently "dist" are actually weights (this is what is reqd for igraph)
+  # set the self-self distances back to almost 1, then do 1.0001-weights to get distances (so nothing ends up being zero)
+  diag(jac_dists) <- 1.0 
+  jac_dists <- 1.0001-jac_dists
+  # run umap with default setting except for specifying that input is distance matrix         
   umap.settings <- umap.defaults
   umap.settings$input <- 'dist'
   clusters_umap <- umap(jac_dists, config = umap.settings)
+  # write umap info to files
+  write.table(clusters_umap$knn$indexes,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_knn_indexes.csv"),row.names = FALSE,col.names = FALSE, sep = ",")
+  write.table(clusters_umap$knn$distances,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_knn_distances.csv"),row.names = FALSE,col.names = FALSE, sep = ",")
+  write.table(clusters_umap$layout,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_layout.csv"),row.names = FALSE,col.names = c("umap_x","umap_y"), sep = ",")
   # now create df with umap coordinates and cluster id for final clusters
   plotting.df <- data.frame(clusters_umap$layout, cl_cl_assignments)
   colnames(plotting.df) <- c('umap_x', 'umap_y', 'cluster')
-  # generate and save umap layout colored by cluster
+  # generate and save umap layout colored by new cluster ID
   if (is.null(INPUT.FOLDER)) {INPUT.FOLDER <- getwd()} #so script calling this function doesn't have to change for now
   ggsave(paste0(INPUT.FOLDER, "/cluster_of_cluster_UMAP.png"),
          plot = ggplot(plotting.df,aes(x=umap_x,y=umap_y, color=factor(cluster))) + 
@@ -184,7 +194,7 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL,
                  panel.background = element_blank(), 
                  axis.line = element_line(colour = "black")),
          height = 7,width = 7)
-           
+  #########################################################         
   # transform cluster numbering from local (each iteration) to global (consensus numbering)
   #start with old table (local, non-consensus numbering) - this will be written over with
   #consensus numbering
