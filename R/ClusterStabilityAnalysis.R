@@ -110,13 +110,12 @@ iterate_louvain_clusters <- function(input_dataset=NULL, subsample_size=NULL, nu
 #' @param clust_iter_table a matrix with each column as separate iteration of cluster assignments
 #'  (same length as full or initially sampled dataset) --note that there should be NAs in this
 #'  table because we want clustering iterations from samples of the dataset (to see how stable
-#'  clusters are)
-#' @param INPUT.FOLDER folder to write umap layout figure          
+#'  clusters are)         
 #' @importFrom igraph make_empty_graph
 #' @importFrom igraph add_edges
 #' @importFrom igraph cluster_louvain
 #' @export
-consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL, INPUT.FOLDER=NULL) {
+consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL) {
   # if clusters are only provided in table format, generate the list too
   if(is.null(clust_iter_list)) {
     clust_iter_list <- apply(clust_iter_table, 2, function(x){
@@ -166,35 +165,7 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL,
   # consensus clusters assignments
   cl_cl <- cluster_louvain(jac_gr)
   cl_cl_assignments <- cl_cl$membership
-  #########################################################
-  # Use distance matrix to generate umap layout of clusters
-  #########################################################
-  # currently "dist" are actually weights (this is what is reqd for igraph)
-  # set the self-self distances back to almost 1, then do 1.0001-weights to get distances (so nothing ends up being zero)
-  diag(jac_dists) <- 1.0 
-  jac_dists <- 1.0001-jac_dists
-  # run umap with default setting except for specifying that input is distance matrix         
-  umap.settings <- umap.defaults
-  umap.settings$input <- 'dist'
-  clusters_umap <- umap(jac_dists, config = umap.settings)
-  # write umap info to files
-  write.table(clusters_umap$knn$indexes,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_knn_indexes.csv"),row.names = FALSE,col.names = FALSE, sep = ",")
-  write.table(clusters_umap$knn$distances,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_knn_distances.csv"),row.names = FALSE,col.names = FALSE, sep = ",")
-  write.table(clusters_umap$layout,file = paste0(INPUT.FOLDER,"/consensus_clust_UMAP_layout.csv"),row.names = FALSE,col.names = c("umap_x","umap_y"), sep = ",")
-  # now create df with umap coordinates and cluster id for final clusters
-  plotting.df <- data.frame(clusters_umap$layout, cl_cl_assignments)
-  colnames(plotting.df) <- c('umap_x', 'umap_y', 'cluster')
-  # generate and save umap layout colored by new cluster ID
-  if (is.null(INPUT.FOLDER)) {INPUT.FOLDER <- getwd()} #so script calling this function doesn't have to change for now
-  ggsave(paste0(INPUT.FOLDER, "/cluster_of_cluster_UMAP.png"),
-         plot = ggplot(plotting.df,aes(x=umap_x,y=umap_y, color=factor(cluster))) + 
-           geom_point(size = 0.8) + 
-           theme(panel.grid.major = element_blank(), 
-                 panel.grid.minor = element_blank(), 
-                 panel.background = element_blank(), 
-                 axis.line = element_line(colour = "black")),
-         height = 7,width = 7)
-  #########################################################         
+        
   # transform cluster numbering from local (each iteration) to global (consensus numbering)
   #start with old table (local, non-consensus numbering) - this will be written over with
   #consensus numbering
@@ -224,6 +195,81 @@ consensus_and_stability <- function(clust_iter_list=NULL, clust_iter_table=NULL,
   return(cbind(consensus_clusters=final_assigns, stability=final_stability))
 }
 
+#' Get UMAP layout for clustering of clusters
+#' @param clust_iter_list a list of lists.  First level list is just all the iterations.  Second
+#'  level (inner) list is a list of each cluster, each one containing the indices of all the
+#'  original datapoints assigned to that cluster
+#' @param clust_iter_table a matrix with each column as separate iteration of cluster assignments
+#'  (same length as full or initially sampled dataset) --note that there should be NAs in this
+#'  table because we want clustering iterations from samples of the dataset (to see how stable
+#'  clusters are)          
+#' @importFrom igraph make_empty_graph
+#' @importFrom igraph add_edges
+#' @importFrom igraph cluster_louvain
+#' @export                           
+consensus_cluster_umap <- function(clust_iter_list=NULL, clust_iter_table=NULL) {
+  # if clusters are only provided in table format, generate the list too
+  if(is.null(clust_iter_list)) {
+    clust_iter_list <- apply(clust_iter_table, 2, function(x){
+      iter_groups <- list()
+      for (c in sort(unique(x))) {
+        iter_groups[[c]] <- which(x==c)
+      }
+      return(iter_groups)
+    })
+  }
+
+  # if clusters are only provided in list format, generate the table too
+  if(is.null(clust_iter_table)) {
+    clust_iter_table <- matrix(data=NA, nrow=max(unlist(clust_iter_list)),
+                               ncol=length(clust_iter_list))
+    for (i in 1:length(clust_iter_list)){
+      for (j in 1:length(clust_iter_list[[i]])){
+        clust_iter_table[clust_iter_list[[i]][[j]],i] <- j
+      }
+    }
+  }
+
+  #------use "clustering of clusters" to identify universal cluster names
+  # first, flatten the list of lists into just a single list (clusters from
+  # all iterations, each item in the list containing the indices of cells assigned to that cluster)
+  all_clusters <- unlist(clust_iter_list, recursive=FALSE)
+  # now calculate the jaccard distance between all clusters in flattened list of clusters.  this is
+  # an all-by-all comparison, so the runtime increases exponentially and
+  # it can take a long time if the number of iterations is high.  With a dataset that gives ~12
+  # clusters, 100 iteration input = 60 seconds for this step, while 20 iterations = 0.5 seconds
+  jac_dists <- matrix(data=unlist(lapply(all_clusters, function(y)
+    unlist(lapply(all_clusters, function(x) length(which(x %in% y))/length(unique(c(x, y))))))),
+    nrow=length(all_clusters), ncol=length(all_clusters))
+  diag(jac_dists) <- 0 #don't want to count the self-self distances, so make them zero
+
+  # prepare vectors for graph construction.  jac_el = edge list, and jac_ed = edge distances
+  jac_el <- as.vector(t(which(jac_dists !=0, arr.ind = T)))
+  jac_ed <- as.vector(jac_dists)[which(jac_dists !=0)]
+
+  # make graph that includes clusters from all iterations, connected by their jaccard distances
+  # note: jaccard distance is already set up for more positive=closer together, so we don't need to
+  # transform from distance to weight here (it's already good to use as edge weight)
+  jac_gr <- make_empty_graph(n=length(all_clusters), directed=FALSE)
+  jac_gr <- add_edges(jac_gr, edges=jac_el, attr=list(weight=jac_ed))
+
+  # now run clustering on the clusters, and get the global cluster assignments that we'll output as
+  # consensus clusters assignments
+  cl_cl <- cluster_louvain(jac_gr)
+  cl_cl_assignments <- cl_cl$membership
+  
+  #------use distance matrix to generate umap layout of clusters
+  # currently "dist" are actually weights (this is what is reqd for igraph)
+  # set the self-self distances back to almost 1, then do 1.0001-weights to get distances (so nothing ends up being zero)
+  diag(jac_dists) <- 1.0 
+  jac_dists <- 1.0001-jac_dists
+  # run umap with default setting except for specifying that input is distance matrix         
+  umap.settings <- umap.defaults
+  umap.settings$input <- 'dist'
+  clusters_umap <- umap(jac_dists, config = umap.settings)
+  return(clusters_umap)
+}
+                           
 #' Take a dataset along with its cluster assignments and cluster certainty/stability
 #' (cutoff_values), and calculate statistics related to how "good" the clusters are.
 #'
